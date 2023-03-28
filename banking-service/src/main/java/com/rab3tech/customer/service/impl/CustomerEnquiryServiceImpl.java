@@ -29,6 +29,7 @@ import com.rab3tech.vo.EmailVO;
 @Service
 @Transactional
 public class CustomerEnquiryServiceImpl implements CustomerEnquiryService {
+	//commenet
 
 	@Autowired
 	private CustomerAccountEnquiryRepository customerAccountEnquiryRepository;
