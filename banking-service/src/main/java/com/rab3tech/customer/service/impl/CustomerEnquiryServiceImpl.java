@@ -35,10 +35,9 @@ public class CustomerEnquiryServiceImpl implements CustomerEnquiryService {
 
 	@Autowired
 	private AccountTypeRepository accountTypeRepository;
-	
+
 	@Autowired
 	private AccountStatusRepository accountStatusRepository;
-	
 
 	@Autowired
 	private EmailService emailService;
@@ -86,27 +85,27 @@ public class CustomerEnquiryServiceImpl implements CustomerEnquiryService {
 		List<CustomerSaving> customerSavingList = customerAccountEnquiryRepository.findAll();
 		return convertEntityIntoVO(customerSavingList);
 	}
-	
+
 	// DRY
 	@Override
 	public List<CustomerSavingVO> findPendingEnquiry() {
-		List<CustomerSaving> customerSavingList = customerAccountEnquiryRepository.findPendingEnquiries(AccountStatusEnum.PENDING.name());
+		List<CustomerSaving> customerSavingList = customerAccountEnquiryRepository
+				.findPendingEnquiries(AccountStatusEnum.PENDING.name());
 		return convertEntityIntoVO(customerSavingList);
 	}
 
 	@Override
 	public boolean emailNotExist(String email) {
 		Optional<CustomerSaving> optional = customerAccountEnquiryRepository.findByEmail(email);
-		if(optional.isPresent()) {
+		if (optional.isPresent()) {
 			return false;
-		}else {
-			return true;	
+		} else {
+			return true;
 		}
 	}
-	
-	
+
 	@Override
-	public String updateEnquiryRegId(int csaid,String ucrid) {
+	public String updateEnquiryRegId(int csaid, String ucrid) {
 		CustomerSaving customerSavingEntity = customerAccountEnquiryRepository.findById(csaid).get();
 		customerSavingEntity.setUcrid(ucrid);
 		return "done";
@@ -121,37 +120,36 @@ public class CustomerEnquiryServiceImpl implements CustomerEnquiryService {
 		customerSavingVO.setStatus(customerSavingEntity.getStatus().getName());
 		return customerSavingVO;
 	}
-	
+
 	@Override
-	public CustomerSavingVO changeEnquiryStatus(int csaid,String status) {
+	public CustomerSavingVO changeEnquiryStatus(int csaid, String status) {
 		CustomerSaving customerSavingEntity = customerAccountEnquiryRepository.findById(csaid).get();
-		//status = APPROVED
-		AccountStatus accountStatus=accountStatusRepository.findByName(status).get();
-		//Updating account status
+		// status = APPROVED
+		AccountStatus accountStatus = accountStatusRepository.findByName(status).get();
+		// Updating account status
 		customerSavingEntity.setStatus(accountStatus);
-		//Sending Back customer enquiry
+		// Sending Back customer enquiry
 		CustomerSavingVO customerSavingVO = new CustomerSavingVO();
 		BeanUtils.copyProperties(customerSavingEntity, customerSavingVO, new String[] { "accType", "status" });
 		customerSavingVO.setAccType(customerSavingEntity.getAccType().getName());
 		customerSavingVO.setStatus(customerSavingEntity.getStatus().getName());
 		return customerSavingVO;
 	}
-	
+
 	@Override
 	public Optional<CustomerSavingVO> findCustomerEnquiryByUuid(String ucrid) {
 		Optional<CustomerSaving> ocustomerSavingEntity = customerAccountEnquiryRepository.findByUcrid(ucrid);
-		if(ocustomerSavingEntity.isPresent()) {
+		if (ocustomerSavingEntity.isPresent()) {
 			CustomerSavingVO customerSavingVO = new CustomerSavingVO();
-			CustomerSaving customerSavingEntity=ocustomerSavingEntity.get();
+			CustomerSaving customerSavingEntity = ocustomerSavingEntity.get();
 			BeanUtils.copyProperties(customerSavingEntity, customerSavingVO, new String[] { "accType", "status" });
 			customerSavingVO.setAccType(customerSavingEntity.getAccType().getName());
 			customerSavingVO.setStatus(customerSavingEntity.getStatus().getName());
-			return Optional.of(customerSavingVO);	
-		}else {
+			return Optional.of(customerSavingVO);
+		} else {
 			return Optional.empty();
 		}
 	}
-	
 
 	@Override
 	public void deleteById(int csaid) {
